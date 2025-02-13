@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>yan</title>
+    <title>Yan.🍣</title>
     <style>
         * {
             margin: 0;
@@ -78,6 +78,51 @@
             height: 100%;
             position: relative;
         }
+        
+       /* 新增底部容器样式 */
+.folder-footer {
+  position: absolute;
+  bottom: 60px;
+  left: 0;
+  width: 100%;
+  text-align: left;
+  color: white;
+  z-index: 1001;
+  padding: 0 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 日期样式 */
+.date {
+  font-size: 16px;
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 3px rgba(255,255,255,0.5);
+}
+
+/* 描述文字样式 */
+.description {
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0.9;
+  max-width: 100%;
+  margin: 0 auto;
+  color: white; /* 确保文字颜色为白色 */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* 添加文字阴影提升可读性 */
+}
+.folder-footer::before {
+  content: "";
+  position: absolute;
+  bottom: -30px;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 20%, transparent);
+  pointer-events: none;
+  z-index: -1;
+}
         .carousel {
             display: flex;
             transition: transform 0.3s;
@@ -106,7 +151,7 @@
             text-indent: -9999px;
             border: none;
             cursor: pointer;
-            z-index: 1001;
+            z-index: 1002;
             border-radius: 50%;
         }
         /* 添加加载动画 */
@@ -253,7 +298,10 @@
                 <div class="swipe-hint swipe-up-hint"></div>
                 <div class="swipe-hint swipe-down-hint"></div>
                 <div class="carousel"></div>
+                <div class="folder-footer">
                 <div class="date"></div>
+                <div class="description"></div>
+                </div>
                 <audio class="bgm"></audio>
                 <div class="close-btn">close</div>
                 </div>
@@ -264,14 +312,29 @@
 const BASE_URL = 'https://yan-1341045368.cos.ap-beijing.myqcloud.com/';  
 
 const foldersData = {  
-    1: { bgm: "250113.mp3", media: ["250113-1.webp", "250113-2.webp","250113-3.webp", "250113-4.webp","250113-5.webp", "250113-6.webp", "250113-7.webp"] },  
-    2: { bgm: "241116.mp3", media: ["241116-1.mp4", "241116-2.mp4"] },  
-    3: { bgm: "241022.mp3", media: ["241022-1.mp4", "241022-2.mp4", "241022-3.mp4", "241022-4.mp4", "241022-5.mp4"] },  
-    4: { bgm: "240912.mp3", media: ["240912-1.webp","240912-2.webp"] },  
-    5: { bgm: "240808.mp3", media: ["240808-1.webp"] },  
-    6: { bgm: "240603.mp3", media: ["240603-1.webp", "240603-2.webp","240603-3.webp"] },  
-    7: { bgm: "240501.mp3", media: ["240501-1.mp4", "240501-2.mp4"] },  
-    8: { media: ["240116-1.mp4"] }
+    1: { bgm: "250113.mp3", 
+    media: ["250113-1.webp", "250113-2.webp","250113-3.webp", "250113-4.webp","250113-5.webp", "250113-6.webp", "250113-7.webp"],
+    description: "我决定做一个照照镜子就能开心一整天的人#我决定重新爱上阳光#每一种生活都值得被记录" },  
+    2: { bgm: "241116.mp3", 
+    media: ["241116-1.mp4", "241116-2.mp4"],
+    description: "幸福总是慢倍速" },  
+    3: { bgm: "241022.mp3", 
+    media: ["241022-1.mp4", "241022-2.mp4", "241022-3.mp4", "241022-4.mp4", "241022-5.mp4"],
+    description: "有迹可循的moment#宝宝你看镜头#一直在一起的人才值得炫耀"},  
+    4: { bgm: "240912.mp3", 
+    media: ["240912-1.webp","240912-2.webp"],
+    description: "于是 我驻足。@L"},  
+    5: { bgm: "240808.mp3", 
+    media: ["240808-1.webp"],
+    description: "冬天来的时候你还在不在#原相机live#冬天"},  
+    6: { bgm: "240603.mp3", 
+    media: ["240603-1.webp", "240603-2.webp","240603-3.webp"],
+    description: "#生活碎片记录" },  
+    7: { bgm: "240501.mp3", 
+    media: ["240501-1.mp4", "240501-2.mp4"],
+    description: "Oh爱本是尘埃#夏天的味道#原相机#分享照片"},  
+    8: { media: ["240116-1.mp4"] ,
+    description: "幸福开始有预兆"}
 };  
 
 let currentFolder = null;  
@@ -318,7 +381,6 @@ musicBtn.addEventListener('click', () => {
     isMusicPlaying = !isMusicPlaying;  
 });  
 
-// 打开文件夹  
 function openFolder(folderId) {  
     currentFolderId = parseInt(folderId); // 记录当前文件夹ID
     const data = foldersData[folderId];  
@@ -326,9 +388,18 @@ function openFolder(folderId) {
     const clone = template.content.cloneNode(true);  
     const container = clone.querySelector('.folder-container');  
 
+    // 设置日期文本
+    const dateElement = container.querySelector('.date');
+    dateElement.textContent = getFormattedDate(folderId);
+
+    // 设置描述文本
+    const descElement = container.querySelector('.description');
+    descElement.textContent = data.description || "记录美好时光";
+    console.log("Description:", data.description); // 打印日志
+
     // 设置背景音乐  
     const bgm = container.querySelector('.bgm');  
-    bgm.src = BASE_URL + data.bgm;  
+    bgm.src = BASE_URL + (data.bgm || "");  
     bgm.loop = true;  
 
     // 初始化轮播内容  
@@ -365,8 +436,6 @@ function openFolder(folderId) {
     // 初始化滑动逻辑  
     initSwipe(container);  
 }  
-
-// 初始化滑动逻辑  
 function initSwipe(container) {  
     let startX = 0;  
     let startY = 0;  
@@ -487,6 +556,20 @@ function getThumbnail(file) {
     }  
     return file;  
 }  
+
+function getFormattedDate(folderId) {
+  const dateMap = {
+    1: "2025年1月13日",
+    2: "2024年11月16日",
+    3: "2024年10月22日",
+    4: "2024年9月12日",
+    5: "2024年8月8日",
+    6: "2024年6月3日",
+    7: "2024年5月1日",
+    8: "2024年1月16日"
+  };
+  return dateMap[folderId] || "未知日期";
+}
 
 // 禁用首页滑动  
 function disableHomeScroll() {  
